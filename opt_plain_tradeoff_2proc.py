@@ -23,6 +23,32 @@ def f_tradeoff(y_vec, alpha):
     return y_tradeoff
 
 
+def gp_sum_predict(X, gp_list, alpha_vec, return_std=False):
+    """Predict mean and std of a weighted sum of GPs assumed to be independent"""
+    assert(len(gp_list) == len(alpha_vec))
+    n_gp = len(gp_list)
+    ny = 1
+    mu = 0
+    if return_std:
+        sigma = 0
+    for gp_idx in range(n_gp):
+        gp = gp_list[gp_idx]
+        alpha = alpha_vec[gp_idx]
+        if return_std:
+            mu_gp, sigma_gp = gp.predict(X, return_std=True)
+            mu += alpha*mu_gp
+            sigma += alpha**2 * sigma_gp**2
+        else:
+            mu_gp = gp.predict(X, return_std=False)
+            mu += alpha*mu_gp
+
+    if return_std:
+        sigma = np.sqrt(sigma) # was a variance until now!
+        return mu, sigma
+    else:
+        return mu
+
+
 def expected_improvement(X, X_sample, Y_sample, gpr, xi=0.01):
     '''
     Computes the EI at points X based on existing samples X_sample
@@ -41,7 +67,8 @@ def expected_improvement(X, X_sample, Y_sample, gpr, xi=0.01):
     mu, sigma = gpr.predict(X, return_std=True)
     mu_sample = gpr.predict(X_sample)
 
-    sigma = sigma.reshape(-1, X_sample.shape[1])
+    #sigma = sigma.reshape(-1, X_sample.shape[1]) # why?
+    sigma = sigma.reshape(-1, 1)  # why?
 
     # Needed for noise-based model,
     # otherwise use np.max(Y_sample).
@@ -49,12 +76,80 @@ def expected_improvement(X, X_sample, Y_sample, gpr, xi=0.01):
     mu_sample_opt = np.max(mu_sample)
 
     with np.errstate(divide='warn'):
-        imp = mu - mu_sample_opt - xi
+        imp = mu - mu_sample_opt - xi # improvement
         Z = imp / sigma
         ei = imp * norm.cdf(Z) + sigma * norm.pdf(Z)
         ei[sigma == 0.0] = 0.0
 
     return ei
+
+
+def expected_improvement_tradeoff(X, X_sample, Y_sample, gpr_list, alpha_vec, xi=0.01):
+    '''
+    Computes the EI at points X based on existing samples X_sample
+    and Y_sample using a Gaussian process surrogate model.
+
+    Args:
+        X: Points at which EI shall be computed (m x d).
+        X_sample: Sample locations (n x d).
+        Y_sample: Sample values (n x 1).
+        gpr: A GaussianProcessRegressor fitted to samples.
+        xi: Exploitation-exploration trade-off parameter.
+
+    Returns:
+        Expected improvements at points X.
+    '''
+
+    mu, sigma = gp_sum_predict(X, gpr_list, alpha_vec, return_std=True)
+
+    mu_sample = gp_sum_predict(X_sample, gpr_list, alpha_vec, return_std=False)
+
+    #sigma = sigma.reshape(-1, X_sample.shape[1]) # why?
+    sigma = sigma.reshape(-1, 1)  # why?
+
+    # Needed for noise-based model,
+    # otherwise use np.max(Y_sample).
+    # See also section 2.4 in [...]
+    mu_sample_opt = np.max(mu_sample)
+
+    with np.errstate(divide='warn'):
+        imp = mu - mu_sample_opt - xi # improvement
+        Z = imp / sigma
+        ei = imp * norm.cdf(Z) + sigma * norm.pdf(Z)
+        ei[sigma == 0.0] = 0.0
+
+    return ei
+
+
+def propose_location_tradeoff(acquisition, X_sample, Y_sample, gpr_list, alpha_vec, bounds, n_restarts=25):
+    '''
+    Proposes the next sampling point by optimizing the acquisition function.
+
+    Args:
+        acquisition: Acquisition function.
+        X_sample: Sample locations (n x d).
+        Y_sample: Sample values (n x 1).
+        gpr: A GaussianProcessRegressor fitted to samples.
+
+    Returns:
+        Location of the acquisition function maximum.
+    '''
+    dim = X_sample.shape[1]
+    min_val = 1
+    min_x = None
+
+    def min_obj(X):
+        # Minimization objective is the negative acquisition function (we want to maximize the acquisition function)
+        return -acquisition(X.reshape(-1, dim), X_sample, Y_sample,  gpr_list, alpha_vec)
+
+    # Find the best optimum by starting from n_restart different random points.
+    for x0 in np.random.uniform(bounds[:, 0], bounds[:, 1], size=(n_restarts, dim)):
+        res = minimize(min_obj, x0=x0, bounds=bounds, method='L-BFGS-B')
+        if res.fun < min_val:
+            min_val = res.fun[0]
+            min_x = res.x
+
+    return min_x.reshape(-1, 1)
 
 
 def propose_location(acquisition, X_sample, Y_sample, gpr, bounds, n_restarts=25):
@@ -71,11 +166,11 @@ def propose_location(acquisition, X_sample, Y_sample, gpr, bounds, n_restarts=25
         Location of the acquisition function maximum.
     '''
     dim = X_sample.shape[1]
-    min_val = np.inf
+    min_val = 1
     min_x = None
 
     def min_obj(X):
-        # Minimization objective is the negative acquisition function
+        # Minimization objective is the negative acquisition function (we want to maximize the acquisition function)
         return -acquisition(X.reshape(-1, dim), X_sample, Y_sample, gpr)
 
     # Find the best optimum by starting from n_restart different random points.
@@ -96,8 +191,11 @@ if __name__ == '__main__':
     bounds = np.array([[-3.0, 3.0]])
 
     # Gaussian process with Matérn kernel as surrogate model
-    m52 = ConstantKernel(1.0) * Matern(length_scale=1.0, nu=2.5)
-    gpr = GaussianProcessRegressor(kernel=m52, alpha = 0.1**2)
+    m52_0 = ConstantKernel(1.0) * Matern(length_scale=1.0, nu=2.5)
+    gpr_0 = GaussianProcessRegressor(kernel=m52_0, alpha = 0.1**2)
+
+    m52_1 = ConstantKernel(1.0) * Matern(length_scale=1.0, nu=2.5)
+    gpr_1 = GaussianProcessRegressor(kernel=m52_1, alpha = 0.1**2)
 
     X_init = np.array([[-2.],
                        [-1.],
@@ -111,6 +209,7 @@ if __name__ == '__main__':
 
     X_sample = np.copy(X_init)
     J_sample = np.copy(Y_init)
+
     for iter_idx in range(n_iter):
         for alpha_idx in range(len(ALPHA_VEC)):
 
@@ -119,10 +218,15 @@ if __name__ == '__main__':
             J_sample_alpha = f_tradeoff(J_sample, alpha)
 
             J_sample_alpha = - J_sample_alpha # in case of minimization
-            gpr.fit(X_sample, J_sample_alpha)   # fit GP for current sample
+
+#            gpr.fit(X_sample, J_sample_alpha)   # fit GP for current sample
+            gpr_0.fit(X_sample, J_sample[:,0])
+            gpr_1.fit(X_sample, J_sample[:,1])
+            alpha_vec = np.array([1.0, alpha])
+            alpha_vec = -alpha_vec # for minimization instead of maximization!
 
             # Obtain next sampling point from the acquisition function (expected_improvement)
-            X_next = propose_location(expected_improvement, X_sample, J_sample_alpha, gpr, bounds)
+            X_next = propose_location_tradeoff(expected_improvement_tradeoff, X_sample, J_sample_alpha, [gpr_0, gpr_1], alpha_vec,  bounds)
 
             # Compute vector output for next sample
             J_next = f_vec(X_next)
