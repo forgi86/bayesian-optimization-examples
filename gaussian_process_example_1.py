@@ -8,7 +8,7 @@ from scipy.optimize import minimize
 import os
 
 # Objective function
-noise = 0.2
+noise = 0.01
 
 
 def f(X, noise=noise):
@@ -23,7 +23,7 @@ if __name__ == '__main__':
     bounds = np.array([[-1.0, 2.0]])
 
     # Gaussian process with Matérn kernel as surrogate model
-    m52 = ConstantKernel(1.5) * Matern(length_scale=1, nu=2.5)
+    m52 = ConstantKernel(5.0) * Matern(length_scale=0.1, nu=10.5)
     gpr = GaussianProcessRegressor(kernel=m52, alpha=noise ** 2)
 
     X_init = np.array([[]]).T

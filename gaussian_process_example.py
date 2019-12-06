@@ -5,6 +5,7 @@ from bayesian_optimization_util import plot_approximation, plot_acquisition
 import numpy as np
 from scipy.stats import norm
 from scipy.optimize import minimize
+import os
 
 # Objective function
 noise = 0.2
@@ -81,6 +82,8 @@ def propose_location(acquisition, X_sample, Y_sample, gpr, bounds, n_restarts=25
 
 if __name__ == '__main__':
 
+    np.random.seed(1)
+
     bounds = np.array([[-1.0, 2.0]])
     X_init = np.array([[-0.9], [1.1]])
     Y_init = f(X_init)
@@ -98,8 +101,6 @@ if __name__ == '__main__':
     plt.legend()
 
 
-
-
     # Gaussian process with Matérn kernel as surrogate model
     m52 = ConstantKernel(1.0) * Matern(length_scale=1.0, nu=2.5)
     gpr = GaussianProcessRegressor(kernel=m52, alpha=noise ** 2)
@@ -110,7 +111,7 @@ if __name__ == '__main__':
 
 
     # Number of iterations
-    n_iter = 10
+    n_iter = 20
 
     plt.figure(figsize=(12, n_iter * 3))
     plt.subplots_adjust(hspace=0.4)
@@ -138,19 +139,40 @@ if __name__ == '__main__':
         # Manually plot #
         plt.figure()
         mu, std = gpr.predict(X, return_std=True)
+        plt.plot(X, mu, 'b-', lw=1, label='GP mean')
         plt.fill_between(X.ravel(),
                          mu.ravel() + 1.96 * std,
                          mu.ravel() - 1.96 * std,
                          alpha=0.1)
-        plt.plot(X, Y, 'y--', lw=1, label=r'$J(\theta)$')
+        plt.plot(np.NaN, np.NaN, 'c', linewidth=4, alpha=0.1, label='GP 95% c.i.')
+        plt.plot(X, Y, 'k', lw=1, label=r'$J(\theta)$')
         plt.xlabel(r"Design parameter $\theta$")
-        plt.xlabel(r"Performance index $J(\theta)$")
-        plt.grid()
-
-        plt.plot(X, mu, 'b-', lw=1, label='Surrogate function')
+        plt.ylabel(r"Performance index $J(\theta)$")
         plt.plot(X_sample, Y_sample, 'kx', mew=3, label='Noisy samples')
-        plt.legend()
+        plt.grid()
+        plt.legend(loc='upper right')
+        plt.ylim([-2.5, 2.5])
+        plt.xlim([-1.1, 2.1])
 
+        fig_filename = f'BO_fit_{i}.pdf'
+        plt.savefig(os.path.join('fig', fig_filename))
+        plt.close()
+
+        plt.figure()
+        EI = expected_improvement(X, X_sample, Y_sample, gpr)
+        plt.plot(X, EI, 'r')
+        plt.plot(X_next, expected_improvement(X_next, X_sample, Y_sample, gpr), 'kx', mew=3)
+        plt.plot()
+        plt.grid()
+        plt.xlim([-1.1, 2.1])
+        plt.xlabel(r"Design parameter $\theta$")
+        plt.ylabel("Acquisition function (-)")
+
+        fig_filename = f'BO_acq_{i}.pdf'
+        plt.savefig(os.path.join('fig', fig_filename))
+        plt.close()
+
+        #plot_acquisition(X, expected_improvement(X, X_sample, Y_sample, gpr), X_next, show_legend=i == 0)
 
         # Add sample to previous samples
         X_sample = np.vstack((X_sample, X_next))
