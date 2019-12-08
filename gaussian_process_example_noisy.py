@@ -8,22 +8,27 @@ from scipy.optimize import minimize
 import os
 
 # Objective function
-noise = 0.01
+noise = 0.2
 
 
 def f(X, noise=noise):
-    return -np.sin(3*X) - X**2 + 0.7*X + noise * np.random.randn(*X.shape)
+    val = -np.sin(3*X) - X**2 + 0.7*X + noise * np.random.randn(*X.shape) + 0.5
+    return -val
 
 
 if __name__ == '__main__':
 
-    np.random.seed(1)
+    np.random.seed(3)
 
-    n_iter = 20
+
+    n_iter = 21
+    RAND_SEQ = np.array([0.5, 1.4, 2.0])
+    RAND_SEQ = (RAND_SEQ+1)/3
+    RAND_SEQ = np.concatenate((RAND_SEQ, np.random.rand(n_iter)))
     bounds = np.array([[-1.0, 2.0]])
 
     # Gaussian process with Matérn kernel as surrogate model
-    m52 = ConstantKernel(5.0) * Matern(length_scale=0.1, nu=10.5)
+    m52 = ConstantKernel(1.0) * Matern(length_scale=0.5, nu=2.5)
     gpr = GaussianProcessRegressor(kernel=m52, alpha=noise ** 2)
 
     X_init = np.array([[]]).T
@@ -58,17 +63,18 @@ if __name__ == '__main__':
         plt.xlabel(r"Design parameter $\theta$")
         plt.ylabel(r"Performance index $J(\theta)$")
         plt.ylim([-2.5, 2.5])
+        plt.xlim([-1.1, 2.5])
         plt.grid()
         if i > 0:
             plt.plot(X_sample, Y_sample, 'kx', mew=3, label='Noisy samples')
-        plt.legend(loc='upper right')
+        plt.legend(loc='lower right')
         plt.tight_layout()
         fig_filename = f'GP_fit_{i}.pdf'
         plt.savefig(os.path.join('fig', fig_filename))
 
 
         # Obtain next sampling point from the acquisition function (expected_improvement)
-        X_next = np.random.rand(1)*3 - 1
+        X_next = RAND_SEQ[i]*3 - 1#np.random.rand(1)*3 - 1
 
         # Obtain next noisy sample from the objective function
         Y_next = f(X_next, noise)
