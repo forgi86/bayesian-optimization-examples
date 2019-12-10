@@ -17,10 +17,10 @@
    height="384"
    viewBox="0 0 480 384"
    sodipodi:docname="PI_fit_6.svg"
-   inkscape:version="0.92.4 (f8dce91, 2019-08-02)"><metadata
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"><metadata
      id="metadata8"><rdf:RDF><cc:Work
          rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title /></cc:Work></rdf:RDF></metadata><defs
      id="defs6"><marker
        inkscape:stockid="TriangleOutM"
        orient="auto"
@@ -221,15 +221,15 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="3770"
-     inkscape:window-height="2089"
+     inkscape:window-width="1853"
+     inkscape:window-height="1025"
      id="namedview4"
      showgrid="false"
      inkscape:zoom="1.4142136"
-     inkscape:cx="-25.495451"
+     inkscape:cx="90.615615"
      inkscape:cy="255.48798"
-     inkscape:window-x="1350"
-     inkscape:window-y="34"
+     inkscape:window-x="67"
+     inkscape:window-y="27"
      inkscape:window-maximized="1"
      inkscape:current-layer="g10" /><g
      id="g10"
@@ -274,6 +274,7 @@
      id="tspan42">1.0</tspan></text>
 
 
+
 <g
    id="g46"
    transform="scale(0.01)"><g
@@ -307,6 +308,7 @@
      id="tspan74">0.5</tspan></text>
 
 
+
 <g
    id="g78"
    transform="scale(0.01)"><g
@@ -338,6 +340,7 @@
      id="tspan104">0.0</tspan></text>
 
 
+
 </g><g
    id="g108"><g
      id="g110"
@@ -358,6 +361,7 @@
      y="0"
      sodipodi:role="line"
      id="tspan122">0.5</tspan></text>
+
 
 
 </g><g
@@ -382,6 +386,7 @@
      id="tspan140">1.0</tspan></text>
 
 
+
 </g><g
    id="g144"><g
      id="g146"
@@ -402,6 +407,7 @@
      y="0"
      sodipodi:role="line"
      id="tspan158">1.5</tspan></text>
+
 
 
 </g><g
@@ -426,6 +432,7 @@
      id="tspan176">2.0</tspan></text>
 
 
+
 </g><g
    id="g180"><g
      id="g182"
@@ -448,6 +455,7 @@
      id="tspan194">2.5</tspan></text>
 
 
+
 <g
    id="g198"
    transform="translate(145.4,16.168125)"><text
@@ -458,6 +466,7 @@
      y="0"
      sodipodi:role="line"
      id="tspan200">Design parameter </tspan></text>
+
 
 
 <g
@@ -492,6 +501,7 @@
      id="tspan232">2</tspan></text>
 
 
+
 <g
    id="g236"
    transform="scale(0.01)"><g
@@ -524,6 +534,7 @@
      id="tspan264">1</tspan></text>
 
 
+
 <g
    id="g268"
    transform="scale(0.01)"><g
@@ -554,6 +565,7 @@
      id="tspan294">0</tspan></text>
 
 
+
 </g><g
    id="g298"><g
      id="g300"
@@ -573,6 +585,7 @@
      x="0"
      y="0"
      id="tspan312">1</tspan></text>
+
 
 
 </g><g
@@ -596,6 +609,7 @@
      id="tspan330">2</tspan></text>
 
 
+
 <g
    id="g334"
    transform="rotate(90,-40.90625,62.61375)"><text
@@ -608,6 +622,7 @@
      id="tspan336">Performance index </tspan></text>
 
 
+
 <text
    transform="matrix(1,0,0,-1,97.792969,0.328125)"
    style="font-style:italic;font-variant:normal;font-size:10px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans-Oblique;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
@@ -615,6 +630,7 @@
      x="0"
      y="0"
      id="tspan340">J</tspan></text>
+
 
 
 <text
@@ -625,6 +641,7 @@
      y="0"
      sodipodi:role="line"
      id="tspan344">()</tspan></text>
+
 
 
 <g
@@ -745,6 +762,7 @@
      id="tspan482">GP mean</tspan></text>
 
 
+
 <path
    d="m 231.9675,89.09 h 20"
    style="fill:none;stroke:#00bfbf;stroke-width:4;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:0.1"
@@ -757,6 +775,7 @@
      y="0"
      sodipodi:role="line"
      id="tspan488">GP 95% c.i.</tspan></text>
+
 
 
 <path
@@ -774,6 +793,7 @@
      id="tspan496">J</tspan></text>
 
 
+
 <text
    transform="matrix(1,0,0,-1,2.9492188,0.328125)"
    style="font-variant:normal;font-weight:normal;font-size:10px;font-family:'DejaVu Sans';-inkscape-font-specification:DejaVuSans;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
@@ -782,6 +802,7 @@
      y="0"
      sodipodi:role="line"
      id="tspan500">()</tspan></text>
+
 
 
 <g
@@ -807,6 +828,7 @@
      id="tspan518">Noisy samples</tspan></text>
 
 
+
 </g><path
    style="fill:none;stroke:#000000;stroke-width:1.50000004;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:1.50000004, 1.50000003999999998;stroke-opacity:0.75652176;stroke-dashoffset:0"
    d="m 49.214915,141.79966 c 291.760005,0 291.760005,0 291.760005,0"
@@ -816,7 +838,7 @@
    d="m 98.146668,277.2 c 0,-231.139655 0,-231.139655 0,-231.139655"
    id="path5032"
    inkscape:connector-curvature="0" /><path
-   style="fill:none;stroke:#000000;stroke-width:2.37788701;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+   style="fill:none;stroke:#999999;stroke-width:3.00000008;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
    d="m 97.634892,267.40871 c 0,0 0.536631,-22.9926 8.710818,-45.26488 5.88851,-16.04451 20.14102,-29.91111 20.27735,-43.03959 0.13835,-13.32393 -12.45357,-27.10497 -18.03822,-43.6256 C 100.43191,111.36043 98.244735,86.031655 98.244735,86.031655"
    id="path5036"
    inkscape:connector-curvature="0"
@@ -826,7 +848,7 @@
    id="path5095"
    inkscape:connector-curvature="0"
    sodipodi:nodetypes="ccssssccc" /><path
-   style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:1.72581995;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.75652179"
+   style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.75652179"
    d="m 130.24177,238.5873 c -0.21094,-11.52121 -0.38354,-25.69447 -0.38354,-31.49614 v -10.54848 h 3.65248 c 2.00887,0 5.64459,-0.16839 8.07938,-0.37421 l 4.4269,-0.37421 -1.76723,4.83258 c -4.07957,11.15577 -10.28051,36.44549 -12.11667,49.41626 -0.64946,4.58781 -1.2544,8.6003 -1.3443,8.91666 -0.0899,0.31636 -0.33607,-8.85125 -0.54702,-20.37246 z"
    id="path5097"
    inkscape:connector-curvature="0"
@@ -846,6 +868,7 @@
      x="130.19214"
      y="-60.659801"
      style="font-size:14.31579018px;stroke-width:0.71578944">PI(-0.5)</tspan></text>
+
 
 
 <g
