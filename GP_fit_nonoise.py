@@ -1,10 +1,7 @@
 import matplotlib.pyplot as plt
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import ConstantKernel, Matern
-from bayesian_optimization_util import plot_approximation, plot_acquisition
 import numpy as np
-from scipy.stats import norm
-from scipy.optimize import minimize
 import os
 
 # Objective function
@@ -20,7 +17,6 @@ if __name__ == '__main__':
 
     np.random.seed(1)
 
-
     n_iter = 21
     RAND_SEQ = np.array([0.5, 1.4, 2.0])
     RAND_SEQ = (RAND_SEQ+1)/3
@@ -33,7 +29,6 @@ if __name__ == '__main__':
 
     X_init = np.array([[]]).T
     Y_init = np.array([[]]).T
-
 
     # Dense grid of points within bounds
     X = np.arange(bounds[:, 0], bounds[:, 1], 0.01).reshape(-1, 1)
@@ -49,7 +44,11 @@ if __name__ == '__main__':
         if i > 0:
             gpr.fit(X_sample, Y_sample)
 
-        # Manually plot #
+        # Plot GP step
+        fig_path = os.path.join("fig", "GP_nonoise")
+        if not os.path.exists(fig_path):
+            os.makedirs(fig_path)
+
         plt.figure(figsize=(5, 4))
         mu, std = gpr.predict(X, return_std=True)
         plt.plot(X, mu, 'b-', lw=1, label='GP mean')
@@ -70,7 +69,7 @@ if __name__ == '__main__':
         plt.legend(loc='lower right')
         plt.tight_layout()
         fig_filename = f'GP_fit_{i}.pdf'
-        plt.savefig(os.path.join('fig', fig_filename))
+        plt.savefig(os.path.join(fig_path, fig_filename))
 
 
         # Obtain next sampling point from the acquisition function (expected_improvement)

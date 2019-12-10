@@ -1,16 +1,14 @@
 import matplotlib.pyplot as plt
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import ConstantKernel, Matern
-from bayesian_optimization_util import plot_approximation, plot_acquisition
 import numpy as np
-from scipy.stats import norm
-from scipy.optimize import minimize
 import os
 
 # Objective function
 noise = 0.2
 
 
+# Function to be modeled as a GP
 def f(X, noise=noise):
     val = -np.sin(3*X) - X**2 + 0.7*X + noise * np.random.randn(*X.shape) + 0.5
     return -val
@@ -19,7 +17,6 @@ def f(X, noise=noise):
 if __name__ == '__main__':
 
     np.random.seed(3)
-
 
     n_iter = 21
     RAND_SEQ = np.array([0.5, 1.4, 2.0])
@@ -49,7 +46,11 @@ if __name__ == '__main__':
         if i > 0:
             gpr.fit(X_sample, Y_sample)
 
-        # Manually plot #
+        # Plot GP step
+        fig_path = os.path.join("fig", "GP_noise")
+        if not os.path.exists(fig_path):
+            os.makedirs(fig_path)
+
         plt.figure(figsize=(5, 4))
         mu, std = gpr.predict(X, return_std=True)
         plt.plot(X, mu, 'b-', lw=1, label='GP mean')
@@ -70,11 +71,10 @@ if __name__ == '__main__':
         plt.legend(loc='lower right')
         plt.tight_layout()
         fig_filename = f'GP_fit_{i}.pdf'
-        plt.savefig(os.path.join('fig', fig_filename))
+        plt.savefig(os.path.join(fig_path, fig_filename))
 
-
-        # Obtain next sampling point from the acquisition function (expected_improvement)
-        X_next = RAND_SEQ[i]*3 - 1#np.random.rand(1)*3 - 1
+        # Obtain next sampling point at random
+        X_next = RAND_SEQ[i]*3 - 1
 
         # Obtain next noisy sample from the objective function
         Y_next = f(X_next, noise)

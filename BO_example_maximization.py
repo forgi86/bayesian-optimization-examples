@@ -1,20 +1,22 @@
 import matplotlib.pyplot as plt
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import ConstantKernel, Matern
-from bayesian_optimization_util import plot_approximation, plot_acquisition
 import numpy as np
 from scipy.stats import norm
 from scipy.optimize import minimize
 import os
 
 # Objective function
-noise = 0.2
+noise = 0.2 # noise level in the cost function
+close_fig = True  # close figures after saving to pdf
 
 
+# This is the function to be maximized
 def f(X, noise=noise):
-    val = -np.sin(3*X) - X**2 + 0.7*X + noise * np.random.randn(*X.shape) + 0.5
-    return -val
+    return -np.sin(3*X) - X**2 + 0.7*X + noise * np.random.randn(*X.shape)
 
+
+# Expected improvement acquisition function
 def expected_improvement(X, X_sample, Y_sample, gpr, xi=0.01):
     '''
     Computes the EI at points X based on existing samples X_sample
@@ -48,8 +50,7 @@ def expected_improvement(X, X_sample, Y_sample, gpr, xi=0.01):
     return ei
 
 
-
-
+# Acquisition function optimization
 def propose_location(acquisition, X_sample, Y_sample, gpr, bounds, n_restarts=25):
     '''
     Proposes the next sampling point by optimizing the acquisition function.
@@ -86,7 +87,7 @@ if __name__ == '__main__':
     np.random.seed(2)
 
     bounds = np.array([[-1.0, 2.0]])
-    X_init = np.array([0.5, 1.4, 2.0]).reshape(-1,1)
+    X_init = np.array([0.3, 1.2, 1.5, 1.9]).reshape(-1, 1)
     Y_init = f(X_init)
 
     # Dense grid of points within bounds
@@ -95,21 +96,13 @@ if __name__ == '__main__':
     # Noise-free objective function values at X
     Y = f(X, 0)
 
-    # Plot optimization objective with noise level
-    plt.plot(X, Y, 'y--', lw=2, label='Noise-free objective')
-    plt.plot(X, f(X), 'bx', lw=1, alpha=0.1, label='Noisy samples')
-    plt.plot(X_init, Y_init, 'kx', mew=3, label='Initial samples')
-    plt.legend()
-
-
     # Gaussian process with Matérn kernel as surrogate model
-    m52 = ConstantKernel(1.0) * Matern(length_scale=1.0, nu=2.5)
+    m52 = ConstantKernel(1.0) * Matern(length_scale=0.5, nu=2.5)
     gpr = GaussianProcessRegressor(kernel=m52, alpha=noise ** 2)
 
     # Initialize samples
     X_sample = np.copy(X_init)
     Y_sample = np.copy(Y_init)
-
 
     # Number of iterations
     n_iter = 20
@@ -119,64 +112,55 @@ if __name__ == '__main__':
 
     for i in range(n_iter):
         # Update Gaussian process with existing samples
-        gpr.fit(X_sample, -Y_sample)
+        gpr.fit(X_sample, Y_sample)
 
         # Obtain next sampling point from the acquisition function (expected_improvement)
-        X_next = propose_location(expected_improvement, X_sample, -Y_sample, gpr, bounds)
+        X_next = propose_location(expected_improvement, X_sample, Y_sample, gpr, bounds)
 
         # Obtain next noisy sample from the objective function
         Y_next = f(X_next, noise)
 
-        # Plot samples, surrogate function, noise-free objective and next sampling location
-        #plt.subplot(n_iter, 2, 2 * i + 1)
-        #plot_approximation(gpr, X, Y, X_sample, Y_sample, X_next, show_legend=i == 0)
-        #plt.title(f'Iteration {i + 1}')
-        # plt.grid(True)
+        # Plot BO step
+        fig_path = os.path.join("fig", "BO_max")
+        if not os.path.exists(fig_path):
+            os.makedirs(fig_path)
 
-        #plt.subplot(n_iter, 2, 2 * i + 2)
-        #plot_acquisition(X, expected_improvement(X, X_sample, Y_sample, gpr), X_next, show_legend=i == 0)
-        # plt.grid(True)
-
-        # Manually plot #
         plt.figure()
         mu, std = gpr.predict(X, return_std=True)
-        plt.plot(X, -mu, 'b-', lw=1, label='GP mean')
+        plt.plot(X, mu, 'b-', lw=1, label='GP mean')
         plt.fill_between(X.ravel(),
-                         -mu.ravel() + 1.96 * std,
-                         -mu.ravel() - 1.96 * std,
-                         alpha=0.1,
-                         color='c')
+                         mu.ravel() + 1.96 * std,
+                         mu.ravel() - 1.96 * std,
+                         alpha=0.1)
         plt.plot(np.NaN, np.NaN, 'c', linewidth=4, alpha=0.1, label='GP 95% c.i.')
         plt.plot(X, Y, 'k', lw=1, label=r'$J(\theta)$')
         plt.xlabel(r"Design parameter $\theta$")
         plt.ylabel(r"Performance index $J(\theta)$")
         plt.plot(X_sample, Y_sample, 'kx', mew=3, label='Noisy samples')
         plt.grid()
-        plt.legend(loc='lower right')
+        plt.legend(loc='upper right')
         plt.ylim([-2.5, 2.5])
-        plt.xlim([-1.1, 2.5])
-        plt.tight_layout()
+        plt.xlim([-1.1, 2.1])
 
         fig_filename = f'BO_fit_{i}.pdf'
-        plt.savefig(os.path.join('fig', fig_filename))
-        plt.close()
+        plt.savefig(os.path.join(fig_path, fig_filename))
+        if close_fig:
+            plt.close()
 
         plt.figure()
-        EI = expected_improvement(X, X_sample, -Y_sample, gpr)
+        EI = expected_improvement(X, X_sample, Y_sample, gpr)
         plt.plot(X, EI, 'r')
-        plt.plot(X_next, expected_improvement(X_next, X_sample, -Y_sample, gpr), 'kx', mew=3)
+        plt.plot(X_next, expected_improvement(X_next, X_sample, Y_sample, gpr), 'kx', mew=3)
         plt.plot()
         plt.grid()
         plt.xlim([-1.1, 2.1])
         plt.xlabel(r"Design parameter $\theta$")
         plt.ylabel("Acquisition function (-)")
-        plt.tight_layout()
-        
-        fig_filename = f'BO_acq_{i}.pdf'
-        plt.savefig(os.path.join('fig', fig_filename))
-        plt.close()
 
-        #plot_acquisition(X, expected_improvement(X, X_sample, Y_sample, gpr), X_next, show_legend=i == 0)
+        fig_filename = f'BO_acq_{i}.pdf'
+        plt.savefig(os.path.join(fig_path, fig_filename))
+        if close_fig:
+            plt.close()
 
         # Add sample to previous samples
         X_sample = np.vstack((X_sample, X_next))
