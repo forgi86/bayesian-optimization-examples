@@ -9,30 +9,6 @@
   \titlepage
 \end{frame}
 
-%\begin{frame}
-%\frametitle{Outline}
-%\tableofcontents
-%\end{frame}
-\begin{frame}{Motivations}
-Obtaining the \structure{predictive model} for {MPC} is \alert{costly} and \alert{time-consuming}.
-\vskip 1em
-Typically, models are obtained through Physical modeling or Identification
-\begin{itemize}
- \item Requires \structure{domain knowledge} and/or \structure{ad-hoc identification experiments}
- \item A trade-off emerges between accuracy and complexity
-\end{itemize}
-\vskip 1em
-It is often difficult to decide \emph{a priori} how accurate the predictive model should be in order to achieve satisfactory closed-loop performance.
-\vskip 1em
-\pause
-In this work:
-\begin{itemize}
-\item We introduce a \structure{data-driven framework} aimed at finding the best model for MPC \structure{from calibration experiments}
-\pause
-\item We specialize this framework for a \structure{hierarchical MPC} architecture often encountered in industrial applications
-\end{itemize}
-\end{frame}
-
 
 \begin{frame}{Bayesian Optimization}{Overview}
 One of the best \emph{off-the-shelf} global optimization algorithms% to date
@@ -269,7 +245,7 @@ $A(\theta) = \mathrm{EI}(\theta)$
 
 \begin{frame}{Bayesian Optimization}{Example}
 \centering
-iteration 10
+iteration 20
 \begin{columns}
 \column{.5\textwidth}
    \begin{figure}
