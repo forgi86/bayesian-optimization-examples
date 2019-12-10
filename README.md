@@ -1,10 +1,10 @@
 # Bayesian Optimization Examples
 
 ## Main scripts:
- * ``BO_maximization.py``: 1-D example of Bayesian Optimization for function maximization 
- * ``BO_minimization.py``: 1-D example of Bayesian Optimization for function minimization 
- * ``GP_fit_noise.py``:  1-D example of Gaussian Process fitting, noiseless function evaluations 
- * ``GP_fit_nonoise.py``: 1-D example of Gaussian Process fitting, noisy function evaluations
+ * ``BO_maximization.py``: Bayesian Optimization for function maximization 
+ * ``BO_minimization.py``: Bayesian Optimization for function minimization 
+ * ``GP_fit_noise.py``:  Gaussian Process fitting, noiseless function evaluations 
+ * ``GP_fit_nonoise.py``: Gaussian Process fitting, noisy function evaluations
 
 These examples are adapted from https://github.com/krasserm/bayesian-machine-learning.git
 
