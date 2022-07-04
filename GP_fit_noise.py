@@ -60,9 +60,9 @@ if __name__ == '__main__':
                          alpha=0.1,
                          color='c')
         plt.plot(np.NaN, np.NaN, 'c', linewidth=4, alpha=0.1, label='GP 95% c.i.')
-        plt.plot(X, Y, 'k', lw=1, label=r'$J(\theta)$')
+        plt.plot(X, Y, 'k', lw=1, label=r'$V(\theta)$')
         plt.xlabel(r"Design parameter $\theta$")
-        plt.ylabel(r"Performance index $J(\theta)$")
+        plt.ylabel(r"Performance index $V(\theta)$")
         plt.ylim([-2.5, 2.5])
         plt.xlim([-1.1, 2.5])
         plt.grid()

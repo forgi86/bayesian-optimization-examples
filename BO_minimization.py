@@ -19,7 +19,7 @@ def f(X, noise=noise):
 
 # Expected Improvement Acquisition function
 def expected_improvement(X, X_sample, Y_sample, gpr, xi=0.01):
-    '''
+    """
     Computes the EI at points X based on existing samples X_sample
     and Y_sample using a Gaussian process surrogate model.
 
@@ -32,10 +32,12 @@ def expected_improvement(X, X_sample, Y_sample, gpr, xi=0.01):
 
     Returns:
         Expected improvements at points X.
-    '''
+    """
+
     mu, sigma = gpr.predict(X, return_std=True)
     mu_sample = gpr.predict(X_sample)
 
+    mu = mu.reshape(-1, X_sample.shape[1])
     sigma = sigma.reshape(-1, X_sample.shape[1])
 
     # Needed for noise-based model,
@@ -52,7 +54,7 @@ def expected_improvement(X, X_sample, Y_sample, gpr, xi=0.01):
 
 
 def propose_location(acquisition, X_sample, Y_sample, gpr, bounds, n_restarts=25):
-    '''
+    """
     Proposes the next sampling point by optimizing the acquisition function.
 
     Args:
@@ -63,22 +65,23 @@ def propose_location(acquisition, X_sample, Y_sample, gpr, bounds, n_restarts=25
 
     Returns:
         Location of the acquisition function maximum.
-    '''
+    """
     dim = X_sample.shape[1]
     min_val = 1
     min_x = None
 
     def min_obj(X):
         # Minimization objective is the negative acquisition function
-        return -acquisition(X.reshape(-1, dim), X_sample, Y_sample, gpr)
+        return -acquisition(X.reshape(-1, dim), X_sample, Y_sample, gpr).squeeze()
 
     # Find the best optimum by starting from n_restart different random points.
     for x0 in np.random.uniform(bounds[:, 0], bounds[:, 1], size=(n_restarts, dim)):
         res = minimize(min_obj, x0=x0, bounds=bounds, method='L-BFGS-B')
         if res.fun < min_val:
-            min_val = res.fun[0]
+            min_val = res.fun#[0]
             min_x = res.x
 
+    #return min_x.squeeze()
     return min_x.reshape(-1, 1)
 
 
@@ -130,9 +133,9 @@ if __name__ == '__main__':
                          alpha=0.1,
                          color='c')
         plt.plot(np.NaN, np.NaN, 'c', linewidth=4, alpha=0.1, label='GP 95% c.i.')
-        plt.plot(X, Y, 'k', lw=1, label=r'$J(\theta)$')
+        plt.plot(X, Y, 'k', lw=1, label=r'$V(\theta)$')
         plt.xlabel(r"Design parameter $\theta$")
-        plt.ylabel(r"Performance index $J(\theta)$")
+        plt.ylabel(r"Performance index $V(\theta)$")
         plt.plot(X_sample, Y_sample, 'kx', mew=3, label='Noisy samples')
         plt.grid()
         plt.legend(loc='lower right')
