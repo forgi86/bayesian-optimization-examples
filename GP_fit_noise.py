@@ -57,9 +57,9 @@ if __name__ == '__main__':
         plt.fill_between(X.ravel(),
                          mu.ravel() + 1.96 * std,
                          mu.ravel() - 1.96 * std,
-                         alpha=0.1,
+                         alpha=0.3,
                          color='c')
-        plt.plot(np.NaN, np.NaN, 'c', linewidth=4, alpha=0.1, label='GP 95% c.i.')
+        plt.plot(np.NaN, np.NaN, 'c', linewidth=4, alpha=0.3, label='GP 95% c.i.')
         plt.plot(X, Y, 'k', lw=1, label=r'$V(\theta)$')
         plt.xlabel(r"Design parameter $\theta$")
         plt.ylabel(r"Performance index $V(\theta)$")

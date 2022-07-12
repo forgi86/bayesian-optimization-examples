@@ -7,7 +7,7 @@ from scipy.optimize import minimize
 import os
 
 # Objective function
-noise = 0.2 # noise level in the cost function
+noise = 0.2  # noise level in the cost function
 close_fig = True  # close figures after saving to pdf
 
 
